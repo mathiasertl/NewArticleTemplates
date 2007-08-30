@@ -39,7 +39,7 @@ function newArticleTemplates( $newPage ) {
 	global $wgNewArticleTemplatesNamespaces, $wgNewArticleTemlatesOnSubpages;
 
 	/* we might want to return if this is a subpage */
-	if ( $wgNewArticleTemplatesOnSubpages and $newPage->mTitle->isSubpage() )
+	if ( (!$wgNewArticleTemplatesOnSubpages) and $newPage->mTitle->isSubpage() )
 		return;
 
 	$namespace = $newPage->mTitle->getNamespace();
