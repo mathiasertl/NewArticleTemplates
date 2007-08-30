@@ -2,7 +2,10 @@
 
 $wgHooks['EditPage::showEditForm:initial'][] = array('newArticleTemplates');
 
-function preload($preload) {
+/**
+ * preload returns the text that is in the article specified by $preload
+ */
+function preload( $preload ) {
 	if ( $preload === '' )
 		return '';
 	else {
@@ -21,28 +24,35 @@ function preload($preload) {
 	}
 }
 
-function newArticleTemplates($newPage)
-{
-	if ( $newPage->mTitle->exists() )
+/**
+ * called by Hook EditPage::showEditForm:initial.
+ * Simply preloads the textbox with a text that is defined in an
+ * article. Also see preload function above.
+ */
+function newArticleTemplates( $newPage ) {
+	global $wgNewArticleTemplatesEnable;
+
+	/* some checks */
+	if ( $newPage->mTitle->exists() or $newPage->firsttime != 1 or !$wgNewArticleTemplatesEnable )
 		return;
 
-	global $wgNewArticleTemplatesEnable;
-	global $wgNewArticleTemplatesNamespaces;
+	global $wgNewArticleTemplatesNamespaces, $wgNewArticleTemlatesOnSubpages;
+
+	/* we might want to return if this is a subpage */
+	if ( $wgNewArticleTemplatesOnSubpages and $newPage->mTitle->isSubpage() )
+		return;
 
 	$namespace = $newPage->mTitle->getNamespace();
 
-	if ( $wgNewArticleTemplatesEnable && $wgNewArticleTemplatesNamespaces[$namespace] )
+	/* actually important code: */
+	if ( $wgNewArticleTemplatesNamespaces[$namespace] )
 	{
-		global $wgNewArticleTemplatesDefault;
-		global $wgNewArticleTemplates_PerNamespace;
+		global $wgNewArticleTemplatesDefault, $wgNewArticleTemplates_PerNamespace;
+
 		if ( $wgNewArticleTemplates_PerNamespace[$namespace] )
-		{
 			$newPage->textbox1 = preload($wgNewArticleTemplates_PerNamespace[$namespace]);
-		}
 		elseif ( $wgNewArticleTemplatesDefault )
-		{
 			$newPage->textbox1 = preload($wgNewArticleTemplatesDefault);
-		}
 	}
 }
 
