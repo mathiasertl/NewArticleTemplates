@@ -34,13 +34,13 @@ function newArticleTemplates( $newPage ) {
 
 	/* some checks */
 	if ( $newPage->mTitle->exists() or $newPage->firsttime != 1 or !$wgNewArticleTemplatesEnable )
-		return;
+		return true;
 
 	global $wgNewArticleTemplatesNamespaces, $wgNewArticleTemlatesOnSubpages;
 
 	/* we might want to return if this is a subpage */
 	if ( (!$wgNewArticleTemplatesOnSubpages) and $newPage->mTitle->isSubpage() )
-		return;
+		return true;
 
 	$namespace = $newPage->mTitle->getNamespace();
 
@@ -54,6 +54,7 @@ function newArticleTemplates( $newPage ) {
 		elseif ( $wgNewArticleTemplatesDefault )
 			$newPage->textbox1 = preload($wgNewArticleTemplatesDefault);
 	}
+	return true;
 }
 
 ?>
