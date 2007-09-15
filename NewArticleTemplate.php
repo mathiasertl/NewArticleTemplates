@@ -1,6 +1,6 @@
 <?php
 
-$wgHooks['EditPage::showEditForm:initial'][] = array('newArticleTemplates');
+$wgHooks['EditPage::showEditForm:initial'][] = 'newArticleTemplates';
 
 /**
  * preload returns the text that is in the article specified by $preload
