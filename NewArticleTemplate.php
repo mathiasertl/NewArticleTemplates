@@ -2,6 +2,14 @@
 
 $wgHooks['EditPage::showEditForm:initial'][] = 'newArticleTemplates';
 
+$wgExtensionCredits['other'][] = array (
+	'name' => 'NewArticleTemplate',
+	'description' => 'Prefills new articles with a given article',
+	'version' => '1.0-1.11.0',
+	'author' => 'Mathias Ertl, Fabian Zeindl',
+	'url' => 'http://pluto.htu.tuwien.ac.at/devel_wiki/index.php/NewArticleTemplates',
+);
+
 /**
  * preload returns the text that is in the article specified by $preload
  */
