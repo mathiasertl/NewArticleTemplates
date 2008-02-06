@@ -5,7 +5,7 @@ $wgHooks['EditPage::showEditForm:initial'][] = 'newArticleTemplates';
 $wgExtensionCredits['other'][] = array (
 	'name' => 'NewArticleTemplate',
 	'description' => 'Prefills new articles with a given article',
-	'version' => '1.0-1.11.0',
+	'version' => '1.1-1.11.0',
 	'author' => 'Mathias Ertl, Fabian Zeindl',
 	'url' => 'http://pluto.htu.tuwien.ac.at/devel_wiki/index.php/NewArticleTemplates',
 );
@@ -44,13 +44,23 @@ function newArticleTemplates( $newPage ) {
 	if ( $newPage->mTitle->exists() or $newPage->firsttime != 1 or !$wgNewArticleTemplatesEnable )
 		return true;
 
-	global $wgNewArticleTemplatesNamespaces, $wgNewArticleTemlatesOnSubpages;
+	global $wgNewArticleTemplatesNamespaces, $wgNewArticleTemplatesOnSubpages;
+
+	/* see if this is a subpage */
+	$title = $newPage->mTitle;
+	if ( $title->isSubpage() ) {
+		$baseTitle = Title::newFromText(
+			$title->getBaseText(),
+			$title->getNamespace() );
+		if ( $baseTitle->exists() )
+			$isSubpage = true;
+	}
 
 	/* we might want to return if this is a subpage */
-	if ( (!$wgNewArticleTemplatesOnSubpages) and $newPage->mTitle->isSubpage() )
+	if ( (! $wgNewArticleTemplatesOnSubpages) && $isSubpage )
 		return true;
 
-	$namespace = $newPage->mTitle->getNamespace();
+	$namespace = $title->getNamespace();
 
 	/* actually important code: */
 	if ( $wgNewArticleTemplatesNamespaces[$namespace] )
@@ -58,9 +68,20 @@ function newArticleTemplates( $newPage ) {
 		global $wgNewArticleTemplatesDefault, $wgNewArticleTemplates_PerNamespace;
 
 		if ( $wgNewArticleTemplates_PerNamespace[$namespace] )
-			$newPage->textbox1 = preload($wgNewArticleTemplates_PerNamespace[$namespace]);
+			$template = $wgNewArticleTemplates_PerNamespace[$namespace];
 		elseif ( $wgNewArticleTemplatesDefault )
-			$newPage->textbox1 = preload($wgNewArticleTemplatesDefault);
+			$template = $wgNewArticleTemplatesDefault;
+
+		/* if this is a subpage, we want to to use $template/Subpage instead, if it exists */
+		if ( $isSubpage ) {
+			$subpageTemplate = Title::newFromText( $template . '/Subpage' );
+			if ( $subpageTemplate->exists() ) {
+				$template = $template . '/Subpage';
+			}
+		}
+
+		$newPage->textbox1 = preload( $template );
+#			$newPage->textbox1 = preload($wgNewArticleTemplatesDefault);
 	}
 	return true;
 }
