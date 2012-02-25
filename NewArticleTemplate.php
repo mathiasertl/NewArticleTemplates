@@ -7,7 +7,7 @@ $wgExtensionCredits['other'][] = array (
 	'description' => 'Prefills new articles with a given article',
 	'version' => '1.1-1.11.0',
 	'author' => 'Mathias Ertl, Fabian Zeindl',
-	'url' => 'http://pluto.htu.tuwien.ac.at/devel_wiki/index.php/NewArticleTemplates',
+	'url' => 'http://www.mediawiki.org/wiki/Extension:NewArticleTemplates',
 );
 
 /**
@@ -48,12 +48,15 @@ function newArticleTemplates( $newPage ) {
 
 	/* see if this is a subpage */
 	$title = $newPage->mTitle;
+	$isSubpage = false;
+
 	if ( $title->isSubpage() ) {
 		$baseTitle = Title::newFromText(
 			$title->getBaseText(),
 			$title->getNamespace() );
-		if ( $baseTitle->exists() )
+		if ( $baseTitle->exists() ) {
 			$isSubpage = true;
+		}
 	}
 
 	/* we might want to return if this is a subpage */
@@ -63,7 +66,7 @@ function newArticleTemplates( $newPage ) {
 	$namespace = $title->getNamespace();
 
 	/* actually important code: */
-	if ( $wgNewArticleTemplatesNamespaces[$namespace] )
+	if (array_key_exists($namespace, $wgNewArticleTemplatesNamespaces))
 	{
 		global $wgNewArticleTemplatesDefault, $wgNewArticleTemplates_PerNamespace;
 
