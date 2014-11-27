@@ -5,7 +5,7 @@ $wgHooks['EditPage::showEditForm:initial'][] = 'newArticleTemplates';
 $wgExtensionCredits['other'][] = array (
 	'name' => 'NewArticleTemplate',
 	'description' => 'Prefills new articles with a given article',
-	'version' => '1.1-1.11.0',
+	'version' => '1.2-1.24.0',
 	'author' => 'Mathias Ertl, Fabian Zeindl',
 	'url' => 'http://www.mediawiki.org/wiki/Extension:NewArticleTemplates',
 );
@@ -18,7 +18,7 @@ function preload( $preload ) {
 		return '';
 	else {
 		$preloadTitle = Title::newFromText( $preload );
-		if ( isset( $preloadTitle ) && $preloadTitle->userCanRead() ) {
+		if ( isset( $preloadTitle ) && $preloadTitle->userCan('read') ) {
 			$rev=Revision::newFromTitle($preloadTitle);
 			if ( is_object( $rev ) ) {
 				$text = $rev->getText();
