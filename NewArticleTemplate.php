@@ -16,15 +16,16 @@ $wgExtensionCredits['other'][] = array (
 function preload( $preload ) {
 	if ( $preload === '' )
 		return '';
-	else {
+    else {
+        // based on EditPage::getPreloadedText(), present until 1.23.x
 		$preloadTitle = Title::newFromText( $preload );
 		if ( isset( $preloadTitle ) && $preloadTitle->userCan('read') ) {
 			$rev=Revision::newFromTitle($preloadTitle);
 			if ( is_object( $rev ) ) {
-				$text = $rev->getText();
-				// TODO FIXME: AAAAAAAAAAA, this shouldn't be implementing
-				// its own mini-parser! -ævar
-				$text = preg_replace( '~</?includeonly>~', '', $text );
+                $text = $rev->getText();
+                // Remove <noinclude> sections and <includeonly> tags from text
+                $text = StringUtils::delimiterReplace( '<noinclude>', '</noinclude>', '', $text );
+                $text = strtr( $text, array( '<includeonly>' => '', '</includeonly>' => '' ) );
 				return $text;
 			} else
 				return '';
