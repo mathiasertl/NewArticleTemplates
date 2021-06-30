@@ -1,0 +1,38 @@
+{
+    "name": "NewArticleTemplates",
+    "version": "1.3",
+    "author": [
+        "Mathias Ertl",
+        "Fabian Zeindl",
+        "jmnote"
+    ],
+    "url": "https://www.mediawiki.org/wiki/Extension:NewArticleTemplates",
+    "description": "Prefills newly created pages with some text.",
+    "license-name": "GPL-3.0-or-later",
+    "type": "parserhook",
+    "AutoloadClasses": {
+        "NewArticleTemplatesHooks": "NewArticleTemplatesHooks.php"
+    },
+    "config": {
+        "NewArticleTemplatesOnSubpages": {
+            "value": false,
+            "description": "Enables on subpages"
+        },
+        "NewArticleTemplatesNamespaces": {
+            "value": [],
+            "description": "Templates are used in these namespaces"
+        },
+        "NewArticleTemplatesPerNamespace": {
+            "value": [],
+            "description": "Mapping template namespaces for page namespaces"
+        },
+        "NewArticleTemplatesDefault": {
+            "value": "",
+            "description": "A default template namespace for any other namespaces"
+        }
+    },
+    "Hooks": {
+        "EditPage::showEditForm:initial": "NewArticleTemplatesHooks::onNewArticle"
+    },
+    "manifest_version": 2	
+}
