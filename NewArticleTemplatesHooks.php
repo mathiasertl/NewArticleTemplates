@@ -4,24 +4,27 @@ class NewArticleTemplatesHooks {
 	 * preload returns the text that is in the article specified by $preload
 	 */
 	public function preload( $preload ) {
-		if ( $preload === '' )
+		if ( $preload === '' ) {
 			return '';
-		else {
-			// based on EditPage::getPreloadedText(), present until 1.23.x
-			$preloadTitle = Title::newFromText( $preload );
-			// if ( isset( $preloadTitle ) && $preloadTitle->userCan('read') ) {
-			if ( isset( $preloadTitle ) ) {
-				$rev=Revision::newFromTitle($preloadTitle);
-				if ( is_object( $rev ) ) {
-					$text = ContentHandler::getContentText( $rev->getContent( Revision::RAW ) );
-					// Remove <noinclude> sections and <includeonly> tags from text
-					$text = StringUtils::delimiterReplace( '<noinclude>', '</noinclude>', '', $text );
-					$text = strtr( $text, ['<includeonly>' => '', '</includeonly>' => ''] );
-					return $text;
-				} else
-					return '';
-			}
 		}
+
+		// working until MediaWiki 1.36
+		// We need userCan?
+		// if ( isset( $preloadTitle ) && $preloadTitle->userCan('read') ) {
+		$preloadTitle = Title::newFromText( $preload );
+		if ( !$preloadTitle ) {
+			return '';
+		}
+		
+		$rev = Revision::newFromTitle($preloadTitle);
+		if ( !$rev ) {
+			return '';
+		}
+		$text = ContentHandler::getContentText( $rev->getContent( Revision::RAW ) );
+		// Remove <noinclude> sections and <includeonly> tags from text
+		$text = StringUtils::delimiterReplace( '<noinclude>', '</noinclude>', '', $text );
+		$text = strtr( $text, ['<includeonly>' => '', '</includeonly>' => ''] );
+		return $text;
 	}
 
 	/**
@@ -34,8 +37,9 @@ class NewArticleTemplatesHooks {
 			$wgNewArticleTemplatesDefault, $wgNewArticleTemplatesPerNamespace;
 		
 		/* some checks */
-		if ( $newPage->mTitle->exists() or $newPage->firsttime != 1 )
+		if ( $newPage->mTitle->exists() or $newPage->firsttime != 1 ) {
 			return true;
+		}
 
 		/* see if this is a subpage */
 		$title = $newPage->mTitle;
@@ -51,28 +55,29 @@ class NewArticleTemplatesHooks {
 		}
 
 		/* we might want to return if this is a subpage */
-		if ( (! $wgNewArticleTemplatesOnSubpages) && $isSubpage )
+		if ( (!$wgNewArticleTemplatesOnSubpages) && $isSubpage ) {
 			return true;
+		}
 
 		$namespace = $title->getNamespace();
 
-		/* actually important code: */
-		if (array_key_exists($namespace, $wgNewArticleTemplatesNamespaces))
-		{
-			if ( $wgNewArticleTemplatesPerNamespace[$namespace] )
-				$template = $wgNewArticleTemplatesPerNamespace[$namespace];
-			elseif ( $wgNewArticleTemplatesDefault )
-				$template = $wgNewArticleTemplatesDefault;
-
-			/* if this is a subpage, we want to to use $template/Subpage instead, if it exists */
-			if ( $isSubpage ) {
-				$subpageTemplate = Title::newFromText( $template . '/Subpage' );
-				if ( $subpageTemplate->exists() ) {
-					$template = $template . '/Subpage';
-				}
-			}
-			$newPage->textbox1 = self::preload( $template );
+		if (!array_key_exists($namespace, $wgNewArticleTemplatesNamespaces)) {
+			return true;
 		}
+		
+		/* actually important code: */
+		if ( $wgNewArticleTemplatesPerNamespace[$namespace] ) {
+			$template = $wgNewArticleTemplatesPerNamespace[$namespace];
+		}
+		elseif ( $wgNewArticleTemplatesDefault ) {
+			$template = $wgNewArticleTemplatesDefault;
+		}
+
+		/* if this is a subpage, we want to to use $template/Subpage instead, if it exists */
+		if ( $isSubpage && Title::newFromText( $template . '/Subpage' )->exists() ) {
+			$template = $template . '/Subpage';
+		}
+		$newPage->textbox1 = self::preload( $template );
 		return true;
 	}
 
