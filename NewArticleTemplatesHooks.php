@@ -3,7 +3,7 @@ class NewArticleTemplatesHooks {
 	/**
 	 * preload returns the text that is in the article specified by $preload
 	 */
-	public function preload( $preload ) {
+	public static function preload( $preload ) {
 		if ( $preload === '' ) {
 			return '';
 		}
@@ -32,7 +32,7 @@ class NewArticleTemplatesHooks {
 	 * Simply preloads the textbox with a text that is defined in an
 	 * article. Also see preload function above.
 	 */
-	public function onNewArticle( $newPage ) {
+	public static function onNewArticle( $newPage ) {
 		global $wgNewArticleTemplatesNamespaces, $wgNewArticleTemplatesOnSubpages,
 			$wgNewArticleTemplatesDefault, $wgNewArticleTemplatesPerNamespace;
 		
