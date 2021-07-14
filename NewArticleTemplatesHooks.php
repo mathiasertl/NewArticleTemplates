@@ -8,18 +8,16 @@ class NewArticleTemplatesHooks {
 			return '';
 		}
 
-		// working until MediaWiki 1.36
-		// We need userCan?
-		// if ( isset( $preloadTitle ) && $preloadTitle->userCan('read') ) {
 		$preloadTitle = Title::newFromText( $preload );
 		if ( !$preloadTitle ) {
 			return '';
 		}
 		
-		$rev = Revision::newFromTitle($preloadTitle);
-		if ( !$rev ) {
+		$article = WikiPage::factory( $preloadTitle );
+		if ( !$article ) {
 			return '';
 		}
+		
 		$text = ContentHandler::getContentText( $rev->getContent( Revision::RAW ) );
 		// Remove <noinclude> sections and <includeonly> tags from text
 		$text = StringUtils::delimiterReplace( '<noinclude>', '</noinclude>', '', $text );
