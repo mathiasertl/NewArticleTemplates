@@ -17,8 +17,8 @@ class NewArticleTemplatesHooks {
 		if ( !$article ) {
 			return '';
 		}
-		
-		$text = ContentHandler::getContentText( $rev->getContent( Revision::RAW ) );
+
+		$text = ContentHandler::getContentText( $article->getContent() );
 		// Remove <noinclude> sections and <includeonly> tags from text
 		$text = StringUtils::delimiterReplace( '<noinclude>', '</noinclude>', '', $text );
 		$text = strtr( $text, ['<includeonly>' => '', '</includeonly>' => ''] );
