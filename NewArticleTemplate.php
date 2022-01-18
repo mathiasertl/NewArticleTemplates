@@ -1,12 +1,15 @@
 <?php
 
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Permissions\PermissionManager;
+
 $wgHooks['EditPage::showEditForm:initial'][] = 'newArticleTemplates';
 
 $wgExtensionCredits['other'][] = array (
 	'name' => 'NewArticleTemplate',
 	'description' => 'Prefills new articles with a given article',
-	'version' => '1.2-1.24.0',
-	'author' => 'Mathias Ertl, Fabian Zeindl',
+	'version' => '1.2-1.36.2',
+	'author' => 'Mathias Ertl, Fabian Zeindl, someone-somenet-org',
 	'url' => 'http://www.mediawiki.org/wiki/Extension:NewArticleTemplates',
 );
 
@@ -16,21 +19,15 @@ $wgExtensionCredits['other'][] = array (
 function preload( $preload ) {
 	if ( $preload === '' )
 		return '';
-    else {
-        // based on EditPage::getPreloadedText(), present until 1.23.x
+	else {
 		$preloadTitle = Title::newFromText( $preload );
-		if ( isset( $preloadTitle ) && $preloadTitle->userCan('read') ) {
+		if ( isset( $preloadTitle ) && MediaWikiServices::getInstance()->getPermissionManager()->userCan( 'read', RequestContext::getMain()->getUser(), $preloadTitle) ) {
 			$rev=Revision::newFromTitle($preloadTitle);
 			if ( is_object( $rev ) ) {
-                // working until MediaWiki 1.29
-		//$text = $rev->getText();
-		//working since MediaWiki 1.29
-                $content = $rev->getContent( Revision::RAW );
-                $text = ContentHandler::getContentText( $content );
-                //End Edit
-                // Remove <noinclude> sections and <includeonly> tags from text
-                $text = StringUtils::delimiterReplace( '<noinclude>', '</noinclude>', '', $text );
-                $text = strtr( $text, array( '<includeonly>' => '', '</includeonly>' => '' ) );
+				$content = $rev->getContent( Revision::RAW );
+				$text = ContentHandler::getContentText( $content );
+				$text = StringUtils::delimiterReplace( '<noinclude>', '</noinclude>', '', $text );
+				$text = strtr( $text, array( '<includeonly>' => '', '</includeonly>' => '' ) );
 				return $text;
 			} else
 				return '';
@@ -94,5 +91,3 @@ function newArticleTemplates( $newPage ) {
 	}
 	return true;
 }
-
-?>
